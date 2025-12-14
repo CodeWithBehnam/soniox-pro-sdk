@@ -62,6 +62,7 @@ class AudioFormat(str, Enum):
 class TranscriptionStatus(str, Enum):
     """Status of an async transcription."""
 
+    QUEUED = "queued"
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -177,11 +178,12 @@ class File(BaseModel):
     """Represents an uploaded audio file."""
 
     id: str
-    name: str
-    size_bytes: int
+    filename: str
+    size: int
     duration_ms: int | None = None
     created_at: datetime
     audio_format: str | None = None
+    client_reference_id: str | None = None
 
 
 class FileList(BaseModel):
@@ -225,12 +227,13 @@ class Transcription(BaseModel):
     id: str
     status: TranscriptionStatus
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None = None
     model: str
     file_id: str | None = None
     audio_url: str | None = None
     error_message: str | None = None
     progress_percent: int | None = None
+    client_reference_id: str | None = None
 
 
 class TranscriptionResult(BaseModel):
@@ -248,6 +251,13 @@ class TranscriptionList(BaseModel):
     has_more: bool = False
 
 
+class WebhookPayload(BaseModel):
+    """Payload sent to webhook endpoint when transcription completes."""
+
+    id: str  # Transcription ID
+    status: str  # "completed" or "error"
+
+
 class CreateTranscriptionRequest(BaseModel):
     """Request to create a new transcription."""
 
@@ -260,6 +270,11 @@ class CreateTranscriptionRequest(BaseModel):
     context: ContextConfig | None = None
     translation: TranslationConfig | None = None
     client_reference_id: str | None = None
+
+    # Webhook configuration
+    webhook_url: str | None = None
+    webhook_auth_header_name: str | None = None
+    webhook_auth_header_value: str | None = None
 
     @field_validator("file_id", "audio_url")
     @classmethod

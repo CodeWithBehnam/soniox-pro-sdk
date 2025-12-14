@@ -5,7 +5,7 @@ This SDK provides comprehensive access to the Soniox Speech-to-Text API,
 including both REST and WebSocket interfaces for transcription and translation.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.3.0"
 __author__ = "Behnam Ebrahimi"
 __license__ = "MIT"
 
@@ -53,6 +53,7 @@ from soniox.types import (
     TranscriptionList,
     TranscriptionStatus,
     TranslationConfig,
+    WebhookPayload,
 )
 
 __all__ = [
@@ -82,6 +83,7 @@ __all__ = [
     "TranscriptionStatus",
     "Transcript",
     "Token",
+    "WebhookPayload",
 
     # Model types
     "Model",

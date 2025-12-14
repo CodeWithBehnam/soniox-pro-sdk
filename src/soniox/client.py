@@ -33,6 +33,7 @@ from soniox.types import (
     FileUrlResponse,
     ModelList,
     TemporaryApiKey,
+    Transcript,
     Transcription,
     TranscriptionList,
     TranscriptionResult,
@@ -91,7 +92,7 @@ class SonioxClient:
         # Create HTTP client with connection pooling
         self._client = httpx.Client(
             base_url=self.config.api_base_url,
-            http2=True,  # Enable HTTP/2 for improved performance
+            http2=False,  # Disable HTTP/2 for compatibility
             timeout=httpx.Timeout(
                 connect=self.config.connect_timeout,
                 read=self.config.read_timeout,
@@ -159,9 +160,14 @@ class SonioxClient:
             SonioxConnectionError: For connection errors
             SonioxTimeoutError: For timeouts
         """
-        url = endpoint if endpoint.startswith("http") else f"/api/v1{endpoint}"
+        url = endpoint if endpoint.startswith("http") else endpoint
         headers = kwargs.pop("headers", {})
         headers["Authorization"] = f"Bearer {self.config.api_key}"
+
+        # Debug logging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Request: {method} {self.config.api_base_url}{url}")
 
         for attempt in range(self.config.max_retries + 1):
             try:
@@ -300,17 +306,13 @@ class FilesAPI:
 
         file_name = name or file_path.name
 
-        def file_stream() -> Generator[bytes, None, None]:
-            """Stream file in 64KB chunks to reduce memory usage."""
-            with open(file_path, "rb") as f:
-                while chunk := f.read(65536):  # 64KB chunks
-                    yield chunk
-
-        files = {"file": (file_name, file_stream(), "application/octet-stream")}
-        response = self.client._request("POST", "/files", files=files)
+        # Open file handle - httpx will handle streaming automatically
+        with open(file_path, "rb") as f:
+            files = {"file": (file_name, f, "application/octet-stream")}
+            response = self.client._request("POST", "/v1/files", files=files)
 
         data = response.json()
-        return File(**data["file"])
+        return File(**data)
 
     def list(
         self,
@@ -412,8 +414,19 @@ class TranscriptionsAPI:
             raise SonioxValidationError(f"Invalid transcription request: {e}") from e
 
         request_dict = request.model_dump(exclude_none=True)
-        response = self.client._request("POST", "/transcriptions", json=request_dict)
-        return Transcription(**response.json()["transcription"])
+        response = self.client._request("POST", "/v1/transcriptions", json=request_dict)
+        data = response.json()
+        # Response is just {"id": "..."}, so we need to create a minimal Transcription object
+        from datetime import datetime
+        return Transcription(
+            id=data["id"],
+            status=TranscriptionStatus.PENDING,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            model=request.model,
+            file_id=request.file_id,
+            audio_url=request.audio_url,
+        )
 
     def get(self, transcription_id: str) -> Transcription:
         """
@@ -425,8 +438,8 @@ class TranscriptionsAPI:
         Returns:
             Transcription object
         """
-        response = self.client._request("GET", f"/transcriptions/{transcription_id}")
-        return Transcription(**response.json()["transcription"])
+        response = self.client._request("GET", f"/v1/transcriptions/{transcription_id}")
+        return Transcription(**response.json())
 
     def get_result(self, transcription_id: str) -> TranscriptionResult:
         """
@@ -449,12 +462,12 @@ class TranscriptionsAPI:
                 transcription_id=transcription_id,
             )
 
-        response = self.client._request("GET", f"/transcriptions/{transcription_id}/transcript")
+        response = self.client._request("GET", f"/v1/transcriptions/{transcription_id}/transcript")
         transcript_data = response.json()
 
         return TranscriptionResult(
             transcription=transcription,
-            transcript=transcript_data.get("transcript"),
+            transcript=Transcript(**transcript_data) if transcript_data else None,
         )
 
     def list(

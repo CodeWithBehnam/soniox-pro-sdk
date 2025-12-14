@@ -59,6 +59,12 @@ pip install soniox-pro-sdk[async]
 # Performance optimisations (C extensions)
 pip install soniox-pro-sdk[performance]
 
+# Microphone input support
+pip install soniox-pro-sdk[microphone]
+
+# Web interface for microphone transcription
+pip install soniox-pro-sdk[web]
+
 # Development tools
 pip install soniox-pro-sdk[dev]
 
@@ -87,15 +93,13 @@ result = client.transcriptions.wait_for_completion(transcription.id)
 print(result.transcript.text)
 ```
 
-### Real-time Transcription
-```python
-from soniox import SonioxRealtimeClient
+### Real-time Transcription from File
 
-# Initialise real-time client
-client = SonioxRealtimeClient(
-    api_key="your-api-key",
-    model="stt-rt-v3",
-)
+```python
+from soniox import SonioxClient
+
+# Initialise client
+client = SonioxClient(api_key="your-api-key")
 
 # Stream audio
 with client.stream() as stream:
@@ -109,6 +113,55 @@ with client.stream() as stream:
             if token.is_final:
                 print(token.text, end="")
 ```
+
+### Real-time Transcription from Microphone 🎤
+
+**NEW:** Transcribe live from your microphone!
+
+```python
+from soniox import SonioxClient
+from soniox.audio import MicrophoneCapture
+
+# Initialise client
+client = SonioxClient(api_key="your-api-key")
+
+# Create microphone capture
+mic = MicrophoneCapture(sample_rate=16000)
+
+# Start real-time stream
+with client.stream() as stream:
+    # Capture and send audio for 10 seconds
+    for audio_chunk in mic.capture(duration=10.0):
+        stream.send_audio(audio_chunk)
+
+    stream.end_stream()
+
+    # Get transcription
+    for response in stream:
+        for token in response.tokens:
+            print(token.text, end=" ", flush=True)
+```
+
+**Web Interface Available!** 🌐
+
+Try the Docker-based web interface for an easy, visual experience:
+
+```bash
+# Clone repository
+git clone https://github.com/CodeWithBehnam/soniox-pro-sdk.git
+cd soniox-pro-sdk
+
+# Configure API key
+cp .env.example .env
+# Add your SONIOX_API_KEY to .env
+
+# Start web interface
+docker compose up
+
+# Open http://localhost:8000 in your browser
+```
+
+See [MICROPHONE_GUIDE.md](MICROPHONE_GUIDE.md) for complete documentation.
 
 ### Async/Await Support
 ```python
