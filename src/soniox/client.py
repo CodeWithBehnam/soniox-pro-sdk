@@ -90,6 +90,7 @@ class SonioxClient:
         # Create HTTP client with connection pooling
         self._client = httpx.Client(
             base_url=self.config.api_base_url,
+            http2=True,  # Enable HTTP/2 for improved performance
             timeout=httpx.Timeout(
                 connect=self.config.connect_timeout,
                 read=self.config.read_timeout,
@@ -178,8 +179,27 @@ class SonioxClient:
                 if response.status_code < 400:
                     return response
 
-                # Handle error responses
-                self._handle_error_response(response)
+                # Handle error responses - returns retry delay if retriable
+                retry_delay = self._handle_error_response(response)
+
+                # If retriable and not last attempt, wait and retry
+                if retry_delay is not None and attempt < self.config.max_retries:
+                    time.sleep(retry_delay)
+                    continue
+                elif retry_delay is None and attempt < self.config.max_retries:
+                    # Use exponential backoff for errors without Retry-After
+                    time.sleep(exponential_backoff(attempt, backoff_factor=self.config.retry_backoff_factor))
+                    continue
+                else:
+                    # Last attempt - raise rate limit error
+                    if response.status_code == 429:
+                        retry_after = extract_retry_after(dict(response.headers))
+                        raise SonioxRateLimitError(
+                            "Rate limit exceeded after retries",
+                            retry_after=retry_after,
+                        )
+                    # Raise generic API error for other retriable errors
+                    raise SonioxAPIError(f"Request failed after {self.config.max_retries} retries")
 
             except httpx.TimeoutException as e:
                 if attempt == self.config.max_retries:
@@ -197,15 +217,18 @@ class SonioxClient:
         # Should never reach here
         raise SonioxAPIError("Maximum retries exceeded")
 
-    def _handle_error_response(self, response: httpx.Response) -> None:
+    def _handle_error_response(self, response: httpx.Response) -> float | None:
         """
         Handle error responses from the API.
 
         Args:
             response: HTTP response
 
+        Returns:
+            Retry delay in seconds if the error is retriable, None otherwise
+
         Raises:
-            Appropriate SonioxError subclass
+            Appropriate SonioxError subclass for non-retriable errors
         """
         try:
             error_data = response.json()
@@ -215,7 +238,7 @@ class SonioxClient:
             error_message = response.text or f"HTTP {response.status_code}"
             error_code = response.status_code
 
-        # Authentication errors
+        # Authentication errors (not retriable)
         if response.status_code == 401:
             raise SonioxAuthenticationError(
                 error_message,
@@ -223,15 +246,18 @@ class SonioxClient:
                 error_code=str(error_code),
             )
 
-        # Rate limit errors
+        # Rate limit errors (retriable with Retry-After)
         if response.status_code == 429:
             retry_after = extract_retry_after(dict(response.headers))
-            raise SonioxRateLimitError(
-                error_message,
-                retry_after=retry_after,
-            )
+            # Return retry delay instead of raising immediately
+            return retry_after if retry_after > 0 else 1.0
 
-        # Generic API errors
+        # Server errors and other retriable status codes
+        if response.status_code in self.config.retry_statuses:
+            # Return None to use exponential backoff
+            return None
+
+        # Generic API errors (not retriable)
         raise SonioxAPIError(
             error_message,
             status_code=response.status_code,
@@ -249,7 +275,10 @@ class FilesAPI:
 
     def upload(self, file_path: str | Path, name: str | None = None) -> File:
         """
-        Upload an audio file.
+        Upload an audio file with streaming to reduce memory usage.
+
+        Files are streamed in 64KB chunks to minimize memory footprint,
+        enabling uploads of large audio files (500MB+) with minimal RAM usage.
 
         Args:
             file_path: Path to audio file
@@ -270,9 +299,14 @@ class FilesAPI:
 
         file_name = name or file_path.name
 
-        with open(file_path, "rb") as f:
-            files = {"file": (file_name, f)}
-            response = self.client._request("POST", "/files", files=files)
+        def file_stream():
+            """Stream file in 64KB chunks to reduce memory usage."""
+            with open(file_path, "rb") as f:
+                while chunk := f.read(65536):  # 64KB chunks
+                    yield chunk
+
+        files = {"file": (file_name, file_stream(), "application/octet-stream")}
+        response = self.client._request("POST", "/files", files=files)
 
         data = response.json()
         return File(**data["file"])
