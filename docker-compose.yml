@@ -1,0 +1,80 @@
+# Soniox Microphone Transcription - Docker Compose Configuration
+#
+# Quick Start:
+#   1. Copy .env.example to .env and add your SONIOX_API_KEY
+#   2. Run: docker compose up
+#   3. Open: http://localhost:4346
+#
+# For development with live reload:
+#   docker compose up --build
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soniox-transcription
+    ports:
+      - "4346:4346"
+    environment:
+      # API Configuration
+      - SONIOX_API_KEY=${SONIOX_API_KEY}
+      - PORT=4346
+
+      # Logging
+      - LOG_LEVEL=info
+
+      # Audio Configuration (Linux only - not needed for web interface on macOS/Windows)
+      # - PULSE_SERVER=/run/user/1000/pulse/native
+
+    # Enable audio device access (Linux only - uncomment for audio passthrough)
+    # Note: macOS/Windows use browser's microphone via getUserMedia API
+    # devices:
+    #   - /dev/snd:/dev/snd
+
+    # Mount volumes for development
+    volumes:
+      # Mount source code for live reload (development only)
+      - ./src:/app/src:ro
+      - ./web:/app/web:ro
+
+      # Audio device access (Linux with PulseAudio - uncomment if needed)
+      # - /run/user/1000/pulse:/run/user/1000/pulse:ro
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4346/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Resource limits (optional, adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Networks (optional, for more complex setups)
+networks:
+  default:
+    name: soniox-network
+
+# Volumes (for persistent data if needed in future)
+volumes:
+  audio-data:
+    name: soniox-audio-data
