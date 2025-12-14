@@ -107,7 +107,7 @@ class SonioxConfig:
             raise ValueError("retry_backoff_factor must be positive")
 
     @classmethod
-    def from_env(cls, **overrides: any) -> "SonioxConfig":
+    def from_env(cls, **overrides: Any) -> "SonioxConfig":
         """
         Create configuration from environment variables.
 
@@ -121,7 +121,7 @@ class SonioxConfig:
         config.validate()
         return config
 
-    def with_overrides(self, **overrides: any) -> "SonioxConfig":
+    def with_overrides(self, **overrides: Any) -> "SonioxConfig":
         """
         Create a new config with specific values overridden.
 

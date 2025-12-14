@@ -41,9 +41,12 @@ def transcribe_command(args: argparse.Namespace) -> None:
         if args.wait:
             print("Waiting for completion...")
             result = client.transcriptions.wait_for_completion(transcription.id)
-            print("\n" + "=" * 60)
-            print(result.transcript.text)
-            print("=" * 60)
+            if result.transcript:
+                print("\n" + "=" * 60)
+                print(result.transcript.text)
+                print("=" * 60)
+            else:
+                print("Error: No transcript available")
 
     finally:
         client.close()
