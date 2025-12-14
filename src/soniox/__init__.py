@@ -10,55 +10,50 @@ __author__ = "Behnam Ebrahimi"
 __license__ = "MIT"
 
 # Main client exports
-from soniox.client import SonioxClient
 from soniox.async_client import AsyncSonioxClient
-from soniox.realtime import SonioxRealtimeClient, AsyncSonioxRealtimeClient
+from soniox.client import SonioxClient
+
+# Configuration exports
+from soniox.config import SonioxConfig
+
+# Error exports
+from soniox.errors import (
+    SonioxAPIError,
+    SonioxAuthenticationError,
+    SonioxConnectionError,
+    SonioxError,
+    SonioxRateLimitError,
+    SonioxTimeoutError,
+    SonioxValidationError,
+)
+from soniox.realtime import AsyncSonioxRealtimeClient, SonioxRealtimeClient
 
 # Type exports
 from soniox.types import (
     # Configuration
     AudioFormat,
-    TranslationConfig,
     ContextConfig,
-
     # File types
     File,
     FileList,
     FileUploadResponse,
-
-    # Transcription types
-    Transcription,
-    TranscriptionList,
-    TranscriptionStatus,
-    Transcript,
-    Token,
-
     # Model types
     Model,
     ModelList,
-
-    # Auth types
-    TemporaryApiKey,
-
     # Real-time types
     RealtimeConfig,
     RealtimeResponse,
     RealtimeToken,
+    # Auth types
+    TemporaryApiKey,
+    Token,
+    Transcript,
+    # Transcription types
+    Transcription,
+    TranscriptionList,
+    TranscriptionStatus,
+    TranslationConfig,
 )
-
-# Error exports
-from soniox.errors import (
-    SonioxError,
-    SonioxAPIError,
-    SonioxConnectionError,
-    SonioxTimeoutError,
-    SonioxAuthenticationError,
-    SonioxRateLimitError,
-    SonioxValidationError,
-)
-
-# Configuration exports
-from soniox.config import SonioxConfig
 
 __all__ = [
     # Version

@@ -8,7 +8,6 @@ This module provides a simple CLI for common operations.
 import argparse
 import sys
 from pathlib import Path
-from typing import Optional
 
 from soniox import SonioxClient, SonioxRealtimeClient
 from soniox.config import SonioxConfig

@@ -9,10 +9,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, field_validator
-
 
 # ============================================================================
 # Enumerations
@@ -104,14 +103,14 @@ class ContextConfig(BaseModel):
     and translation preferences.
     """
 
-    general: Optional[list[ContextKeyValue]] = None
-    text: Optional[str] = None
-    terms: Optional[list[str]] = None
-    translation_terms: Optional[list[TranslationTerm]] = None
+    general: list[ContextKeyValue] | None = None
+    text: str | None = None
+    terms: list[str] | None = None
+    translation_terms: list[TranslationTerm] | None = None
 
     @field_validator("text")
     @classmethod
-    def validate_text_length(cls, v: Optional[str]) -> Optional[str]:
+    def validate_text_length(cls, v: str | None) -> str | None:
         """Validate context text length."""
         if v and len(v) > 10000:
             raise ValueError("Context text cannot exceed 10,000 characters")
@@ -145,28 +144,28 @@ class Token(BaseModel):
     """A single transcription token (word or sub-word)."""
 
     text: str
-    start_ms: Optional[int] = None
-    end_ms: Optional[int] = None
+    start_ms: int | None = None
+    end_ms: int | None = None
     confidence: float
     is_final: bool = False
-    speaker: Optional[str] = None
-    language: Optional[str] = None
-    translation_status: Optional[TranslationStatusEnum] = None
-    source_language: Optional[str] = None
+    speaker: str | None = None
+    language: str | None = None
+    translation_status: TranslationStatusEnum | None = None
+    source_language: str | None = None
 
 
 class RealtimeToken(BaseModel):
     """Token from real-time transcription stream."""
 
     text: str
-    start_ms: Optional[int] = None
-    end_ms: Optional[int] = None
-    confidence: Optional[float] = None
+    start_ms: int | None = None
+    end_ms: int | None = None
+    confidence: float | None = None
     is_final: bool = False
-    speaker: Optional[str] = None
-    language: Optional[str] = None
-    translation_status: Optional[TranslationStatusEnum] = None
-    source_language: Optional[str] = None
+    speaker: str | None = None
+    language: str | None = None
+    translation_status: TranslationStatusEnum | None = None
+    source_language: str | None = None
 
 
 # ============================================================================
@@ -180,9 +179,9 @@ class File(BaseModel):
     id: str
     name: str
     size_bytes: int
-    duration_ms: Optional[int] = None
+    duration_ms: int | None = None
     created_at: datetime
-    audio_format: Optional[str] = None
+    audio_format: str | None = None
 
 
 class FileList(BaseModel):
@@ -216,8 +215,8 @@ class Transcript(BaseModel):
 
     text: str
     tokens: list[Token]
-    duration_ms: Optional[int] = None
-    language: Optional[str] = None
+    duration_ms: int | None = None
+    language: str | None = None
 
 
 class Transcription(BaseModel):
@@ -228,17 +227,17 @@ class Transcription(BaseModel):
     created_at: datetime
     updated_at: datetime
     model: str
-    file_id: Optional[str] = None
-    audio_url: Optional[str] = None
-    error_message: Optional[str] = None
-    progress_percent: Optional[int] = None
+    file_id: str | None = None
+    audio_url: str | None = None
+    error_message: str | None = None
+    progress_percent: int | None = None
 
 
 class TranscriptionResult(BaseModel):
     """Complete transcription result."""
 
     transcription: Transcription
-    transcript: Optional[Transcript] = None
+    transcript: Transcript | None = None
 
 
 class TranscriptionList(BaseModel):
@@ -253,18 +252,18 @@ class CreateTranscriptionRequest(BaseModel):
     """Request to create a new transcription."""
 
     model: str
-    file_id: Optional[str] = None
-    audio_url: Optional[str] = None
-    language_hints: Optional[list[str]] = None
+    file_id: str | None = None
+    audio_url: str | None = None
+    language_hints: list[str] | None = None
     enable_speaker_diarization: bool = False
     enable_language_identification: bool = False
-    context: Optional[ContextConfig] = None
-    translation: Optional[TranslationConfig] = None
-    client_reference_id: Optional[str] = None
+    context: ContextConfig | None = None
+    translation: TranslationConfig | None = None
+    client_reference_id: str | None = None
 
     @field_validator("file_id", "audio_url")
     @classmethod
-    def validate_audio_source(cls, v: Optional[str], info: Any) -> Optional[str]:
+    def validate_audio_source(cls, v: str | None, info: Any) -> str | None:
         """Ensure exactly one audio source is provided."""
         # This will be validated at the request level
         return v
@@ -283,7 +282,7 @@ class Model(BaseModel):
     type: str  # "realtime" or "async"
     languages: list[str]
     capabilities: list[str]
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ModelList(BaseModel):
@@ -321,19 +320,19 @@ class RealtimeConfig(BaseModel):
     api_key: str
     model: str
     audio_format: AudioFormat = AudioFormat.AUTO
-    sample_rate: Optional[int] = None
-    num_channels: Optional[int] = None
-    language_hints: Optional[list[str]] = None
-    context: Optional[ContextConfig] = None
+    sample_rate: int | None = None
+    num_channels: int | None = None
+    language_hints: list[str] | None = None
+    context: ContextConfig | None = None
     enable_speaker_diarization: bool = False
     enable_language_identification: bool = False
     enable_endpoint_detection: bool = False
-    translation: Optional[TranslationConfig] = None
-    client_reference_id: Optional[str] = None
+    translation: TranslationConfig | None = None
+    client_reference_id: str | None = None
 
     @field_validator("sample_rate", "num_channels")
     @classmethod
-    def validate_pcm_requirements(cls, v: Optional[int], info: Any) -> Optional[int]:
+    def validate_pcm_requirements(cls, v: int | None, info: Any) -> int | None:
         """Validate PCM format requirements."""
         # If audio_format is PCM, these fields are required
         # This will be validated at request time
@@ -347,15 +346,15 @@ class RealtimeResponse(BaseModel):
     audio_final_proc_ms: int = 0
     audio_total_proc_ms: int = 0
     finished: bool = False
-    error_code: Optional[int] = None
-    error_message: Optional[str] = None
+    error_code: int | None = None
+    error_message: str | None = None
 
 
 class FinalizeRequest(BaseModel):
     """Request to manually finalize audio."""
 
     type: Literal["finalize"] = "finalize"
-    trailing_silence_ms: Optional[int] = None
+    trailing_silence_ms: int | None = None
 
 
 class KeepaliveRequest(BaseModel):
@@ -374,4 +373,4 @@ class ErrorResponse(BaseModel):
 
     error_code: int
     error_message: str
-    details: Optional[dict[str, Any]] = None
+    details: dict[str, Any] | None = None

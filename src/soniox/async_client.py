@@ -6,9 +6,8 @@ This module provides async/await support for the Soniox REST API.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
-from soniox.client import SonioxClient
 from soniox.config import SonioxConfig
 
 
@@ -37,8 +36,8 @@ class AsyncSonioxClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        config: Optional[SonioxConfig] = None,
+        api_key: str | None = None,
+        config: SonioxConfig | None = None,
         **config_overrides: Any,
     ) -> None:
         """

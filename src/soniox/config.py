@@ -8,7 +8,6 @@ configuration files, and direct parameters.
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -23,7 +22,7 @@ class SonioxConfig:
     """
 
     # Authentication
-    api_key: Optional[str] = None
+    api_key: str | None = None
 
     # API endpoints
     api_base_url: str = "https://api.soniox.com"
@@ -59,7 +58,7 @@ class SonioxConfig:
         if self.api_key is None:
             self.api_key = self._load_from_env()
 
-    def _load_from_env(self) -> Optional[str]:
+    def _load_from_env(self) -> str | None:
         """
         Load API key from environment variables.
 

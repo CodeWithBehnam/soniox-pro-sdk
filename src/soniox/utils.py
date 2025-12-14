@@ -3,9 +3,10 @@ Utility functions and helpers for the Soniox SDK.
 """
 
 import time
-from typing import Any, Callable, Optional, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
 
-from soniox.errors import SonioxRateLimitError, SonioxTimeoutError
+from soniox.errors import SonioxTimeoutError
 
 T = TypeVar("T")
 
@@ -46,7 +47,7 @@ def should_retry(status_code: int, retry_statuses: tuple[int, ...]) -> bool:
     return status_code in retry_statuses
 
 
-def extract_retry_after(headers: dict[str, str]) -> Optional[int]:
+def extract_retry_after(headers: dict[str, str]) -> int | None:
     """
     Extract Retry-After header value.
 
@@ -65,7 +66,7 @@ def extract_retry_after(headers: dict[str, str]) -> Optional[int]:
     return None
 
 
-def validate_audio_source(file_id: Optional[str], audio_url: Optional[str]) -> None:
+def validate_audio_source(file_id: str | None, audio_url: str | None) -> None:
     """
     Validate that exactly one audio source is provided.
 
@@ -86,9 +87,9 @@ def poll_until_complete(
     get_status: Callable[[], T],
     is_complete: Callable[[T], bool],
     is_failed: Callable[[T], bool],
-    get_error: Callable[[T], Optional[str]],
+    get_error: Callable[[T], str | None],
     poll_interval: float = 2.0,
-    timeout: Optional[float] = None,
+    timeout: float | None = None,
 ) -> T:
     """
     Poll a resource until it completes or fails.

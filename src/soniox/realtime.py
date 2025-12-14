@@ -8,9 +8,10 @@ and receiving real-time transcription results.
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union
+from typing import Any
 
 import websockets.sync.client as ws_sync
 from pydantic import ValidationError
@@ -67,7 +68,7 @@ class RealtimeStream:
         except Exception as e:
             raise SonioxWebSocketError(f"Failed to send audio: {e}") from e
 
-    def send_finalize(self, trailing_silence_ms: Optional[int] = None) -> None:
+    def send_finalize(self, trailing_silence_ms: int | None = None) -> None:
         """
         Send finalize request to finalize pending audio.
 
@@ -199,10 +200,10 @@ class SonioxRealtimeClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         model: str = "stt-rt-v3",
         audio_format: AudioFormat = AudioFormat.AUTO,
-        config: Optional[SonioxConfig] = None,
+        config: SonioxConfig | None = None,
         **realtime_options: Any,
     ) -> None:
         """
@@ -286,7 +287,7 @@ class SonioxRealtimeClient:
 
     def transcribe_file(
         self,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         chunk_size: int = 4096,
     ) -> list[RealtimeResponse]:
         """
@@ -353,7 +354,7 @@ class AsyncSonioxRealtimeClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         model: str = "stt-rt-v3",
         audio_format: AudioFormat = AudioFormat.AUTO,
         **realtime_options: Any,

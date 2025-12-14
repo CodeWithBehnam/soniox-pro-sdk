@@ -5,7 +5,7 @@ This module defines all custom exceptions that can be raised by the SDK,
 providing a clear hierarchy for error handling.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 class SonioxError(Exception):
@@ -30,9 +30,9 @@ class SonioxAPIError(SonioxError):
     def __init__(
         self,
         message: str,
-        status_code: Optional[int] = None,
-        error_code: Optional[str] = None,
-        response_body: Optional[str] = None,
+        status_code: int | None = None,
+        error_code: str | None = None,
+        response_body: str | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -60,7 +60,7 @@ class SonioxConnectionError(SonioxError):
 class SonioxTimeoutError(SonioxError):
     """Raised when a request to the Soniox API times out."""
 
-    def __init__(self, message: str, timeout: Optional[float] = None, **kwargs: Any) -> None:
+    def __init__(self, message: str, timeout: float | None = None, **kwargs: Any) -> None:
         """
         Initialise a timeout error.
 
@@ -85,7 +85,7 @@ class SonioxRateLimitError(SonioxAPIError):
     def __init__(
         self,
         message: str,
-        retry_after: Optional[int] = None,
+        retry_after: int | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -103,7 +103,7 @@ class SonioxRateLimitError(SonioxAPIError):
 class SonioxValidationError(SonioxError):
     """Raised when input validation fails."""
 
-    def __init__(self, message: str, field: Optional[str] = None, **kwargs: Any) -> None:
+    def __init__(self, message: str, field: str | None = None, **kwargs: Any) -> None:
         """
         Initialise a validation error.
 
@@ -128,7 +128,7 @@ class SonioxTranscriptionError(SonioxAPIError):
     def __init__(
         self,
         message: str,
-        transcription_id: Optional[str] = None,
+        transcription_id: str | None = None,
         **kwargs: Any,
     ) -> None:
         """

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 from pydantic import ValidationError
@@ -29,9 +29,7 @@ from soniox.types import (
     CreateTranscriptionRequest,
     File,
     FileList,
-    FileUploadResponse,
     FileUrlResponse,
-    Model,
     ModelList,
     TemporaryApiKey,
     Transcription,
@@ -39,7 +37,7 @@ from soniox.types import (
     TranscriptionResult,
     TranscriptionStatus,
 )
-from soniox.utils import exponential_backoff, extract_retry_after, poll_until_complete, should_retry
+from soniox.utils import exponential_backoff, extract_retry_after, poll_until_complete
 
 
 class SonioxClient:
@@ -65,8 +63,8 @@ class SonioxClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        config: Optional[SonioxConfig] = None,
+        api_key: str | None = None,
+        config: SonioxConfig | None = None,
         **config_overrides: Any,
     ) -> None:
         """
@@ -131,10 +129,10 @@ class SonioxClient:
         method: str,
         endpoint: str,
         *,
-        json: Optional[dict[str, Any]] = None,
-        data: Optional[dict[str, Any]] = None,
-        files: Optional[dict[str, Any]] = None,
-        params: Optional[dict[str, Any]] = None,
+        json: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> httpx.Response:
         """
@@ -249,7 +247,7 @@ class FilesAPI:
         """Initialise FilesAPI with client reference."""
         self.client = client
 
-    def upload(self, file_path: Union[str, Path], name: Optional[str] = None) -> File:
+    def upload(self, file_path: str | Path, name: str | None = None) -> File:
         """
         Upload an audio file.
 
@@ -344,8 +342,8 @@ class TranscriptionsAPI:
     def create(
         self,
         model: str = "stt-async-v3",
-        file_id: Optional[str] = None,
-        audio_url: Optional[str] = None,
+        file_id: str | None = None,
+        audio_url: str | None = None,
         **kwargs: Any,
     ) -> Transcription:
         """
@@ -456,7 +454,7 @@ class TranscriptionsAPI:
         self,
         transcription_id: str,
         poll_interval: float = 2.0,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
     ) -> TranscriptionResult:
         """
         Wait for transcription to complete.
@@ -488,7 +486,7 @@ class TranscriptionsAPI:
         def is_failed(t: Transcription) -> bool:
             return t.status == TranscriptionStatus.FAILED
 
-        def get_error(t: Transcription) -> Optional[str]:
+        def get_error(t: Transcription) -> str | None:
             return t.error_message
 
         transcription = poll_until_complete(
