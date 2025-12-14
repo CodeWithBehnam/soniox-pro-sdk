@@ -132,7 +132,7 @@ class TwoWayTranslationConfig(BaseModel):
     language_b: str = Field(..., description="ISO code for second language")
 
 
-TranslationConfig = Union[OneWayTranslationConfig, TwoWayTranslationConfig]
+TranslationConfig = OneWayTranslationConfig | TwoWayTranslationConfig
 
 
 # ============================================================================
