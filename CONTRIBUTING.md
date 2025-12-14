@@ -40,7 +40,7 @@ maintainers.
 3. **Add upstream remote**:
 
    ```bash
-   git remote add upstream https://github.com/behnamebrahimi/soniox-pro-sdk.git
+   git remote add upstream https://github.com/CodeWithBehnam/soniox-pro-sdk.git
    ```
 
 ## Development Setup

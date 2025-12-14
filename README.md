@@ -127,7 +127,7 @@ text = asyncio.run(transcribe())
 
 ## Documentation
 
-Full documentation available at: <https://github.com/behnamebrahimi/soniox-pro-sdk>
+Full documentation available at: <https://github.com/CodeWithBehnam/soniox-pro-sdk>
 
 ## Testing
 
@@ -151,8 +151,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- Documentation: <https://github.com/behnamebrahimi/soniox-pro-sdk>
-- Source Code: <https://github.com/behnamebrahimi/soniox-pro-sdk>
+- Documentation: <https://github.com/CodeWithBehnam/soniox-pro-sdk>
+- Source Code: <https://github.com/CodeWithBehnam/soniox-pro-sdk>
 - Soniox API: <https://soniox.com/docs>
 
 ---

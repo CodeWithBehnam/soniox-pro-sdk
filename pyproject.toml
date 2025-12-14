@@ -62,10 +62,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/behnamebrahimi/soniox-python-sdk"
-Documentation = "https://soniox-python-sdk.readthedocs.io"
-Repository = "https://github.com/behnamebrahimi/soniox-python-sdk"
-"Bug Tracker" = "https://github.com/behnamebrahimi/soniox-python-sdk/issues"
+Homepage = "https://github.com/CodeWithBehnam/soniox-pro-sdk"
+Documentation = "https://codewithbehnam.github.io/soniox-pro-sdk"
+Repository = "https://github.com/CodeWithBehnam/soniox-pro-sdk"
+"Bug Tracker" = "https://github.com/CodeWithBehnam/soniox-pro-sdk/issues"
 
 [project.scripts]
 soniox-pro = "soniox.cli:main"
