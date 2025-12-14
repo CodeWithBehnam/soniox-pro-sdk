@@ -8,6 +8,7 @@ REST API in a synchronous manner.
 from __future__ import annotations
 
 import time
+from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
@@ -250,7 +251,7 @@ class SonioxClient:
         if response.status_code == 429:
             retry_after = extract_retry_after(dict(response.headers))
             # Return retry delay instead of raising immediately
-            return retry_after if retry_after > 0 else 1.0
+            return retry_after if (retry_after is not None and retry_after > 0) else 1.0
 
         # Server errors and other retriable status codes
         if response.status_code in self.config.retry_statuses:
@@ -299,7 +300,7 @@ class FilesAPI:
 
         file_name = name or file_path.name
 
-        def file_stream():
+        def file_stream() -> Generator[bytes, None, None]:
             """Stream file in 64KB chunks to reduce memory usage."""
             with open(file_path, "rb") as f:
                 while chunk := f.read(65536):  # 64KB chunks
