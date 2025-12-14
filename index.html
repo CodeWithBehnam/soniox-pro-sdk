@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soniox Pro SDK - Professional Python SDK for Speech-to-Text</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#1f2937',
+                primaryBorderColor: '#2563eb',
+                lineColor: '#6b7280',
+                secondaryColor: '#f3f4f6',
+                tertiaryColor: '#e5e7eb'
+            }
+        });
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-6">
+            <h1 class="text-5xl font-bold mb-4">Soniox Pro SDK</h1>
+            <p class="text-xl mb-8">Professional Python SDK for Soniox Speech-to-Text API</p>
+            <div class="flex gap-4">
+                <a href="https://github.com/CodeWithBehnam/soniox-pro-sdk"
+                   class="bg-white text-purple-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    View on GitHub
+                </a>
+                <a href="https://pypi.org/project/soniox-pro-sdk/"
+                   class="bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-800 transition border-2 border-white">
+                    Install from PyPI
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Features</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold mb-3">Blazing Fast</h3>
+                    <p class="text-gray-600">Optimised HTTP client with connection pooling and async support</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h3 class="text-xl font-bold mb-3">Type Safe</h3>
+                    <p class="text-gray-600">Full Pydantic v2 models with strict mypy compliance</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold mb-3">Production Ready</h3>
+                    <p class="text-gray-600">Comprehensive error handling, retries, and logging</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🌐</div>
+                    <h3 class="text-xl font-bold mb-3">Real-time</h3>
+                    <p class="text-gray-600">WebSocket support for streaming transcription</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🌍</div>
+                    <h3 class="text-xl font-bold mb-3">60+ Languages</h3>
+                    <p class="text-gray-600">Support for multilingual transcription and translation</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="text-4xl mb-4">🎤</div>
+                    <h3 class="text-xl font-bold mb-3">Speaker Diarization</h3>
+                    <p class="text-gray-600">Identify and separate multiple speakers</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Quick Start</h2>
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-gray-900 text-white p-6 rounded-lg mb-8">
+                    <pre class="overflow-x-auto"><code class="text-sm"># Install with uv (recommended)
+uv add soniox-pro-sdk
+
+# Or with pip
+pip install soniox-pro-sdk</code></pre>
+                </div>
+                <div class="bg-gray-900 text-white p-6 rounded-lg">
+                    <pre class="overflow-x-auto"><code class="text-sm">from soniox import SonioxClient
+
+# Initialize client
+client = SonioxClient(api_key="your-api-key")
+
+# Upload audio file
+file_id = client.files.upload("audio.mp3")
+
+# Create transcription
+transcription = client.transcriptions.create(
+    file_id=file_id,
+    model="stt-rt-v3",
+    enable_speaker_diarization=True
+)
+
+# Get results
+result = client.transcriptions.get(transcription.id)
+print(result.text)</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Diagram -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">SDK Architecture</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <pre class="mermaid">
+graph TB
+    subgraph "Client Layer"
+        Client[SonioxClient]
+        AsyncClient[SonioxAsyncClient]
+        RTClient[SonioxRealtimeClient]
+    end
+
+    subgraph "API Resources"
+        Files[FilesAPI]
+        Trans[TranscriptionsAPI]
+        Models[ModelsAPI]
+        Auth[AuthAPI]
+    end
+
+    subgraph "Core Components"
+        Config[SonioxConfig]
+        Types[Pydantic Types]
+        Errors[Custom Exceptions]
+        Utils[Utilities]
+    end
+
+    subgraph "Transport Layer"
+        HTTP[httpx Client]
+        WS[WebSocket Client]
+        Pool[Connection Pool]
+    end
+
+    Client --> Files
+    Client --> Trans
+    Client --> Models
+    Client --> Auth
+
+    AsyncClient -.-> Files
+    AsyncClient -.-> Trans
+
+    RTClient --> WS
+
+    Files --> HTTP
+    Trans --> HTTP
+    Models --> HTTP
+    Auth --> HTTP
+
+    HTTP --> Pool
+
+    Client --> Config
+    Client --> Types
+    Client --> Errors
+    Client --> Utils
+
+    style Client fill:#3b82f6,stroke:#2563eb,color:#fff
+    style AsyncClient fill:#3b82f6,stroke:#2563eb,color:#fff
+    style RTClient fill:#3b82f6,stroke:#2563eb,color:#fff
+    style HTTP fill:#10b981,stroke:#059669,color:#fff
+    style WS fill:#10b981,stroke:#059669,color:#fff
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- REST API Flow -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">REST API Flow</h2>
+            <div class="bg-gray-50 p-8 rounded-lg shadow-lg">
+                <pre class="mermaid">
+sequenceDiagram
+    participant App as Your Application
+    participant SDK as Soniox SDK
+    participant API as Soniox API
+
+    App->>SDK: client.files.upload(audio)
+    SDK->>API: POST /files
+    API-->>SDK: {file_id, status}
+    SDK-->>App: file_id
+
+    App->>SDK: client.transcriptions.create(file_id)
+    SDK->>API: POST /transcriptions
+    API-->>SDK: {id, status: "processing"}
+    SDK-->>App: Transcription object
+
+    loop Poll for completion
+        App->>SDK: client.transcriptions.get(id)
+        SDK->>API: GET /transcriptions/{id}
+        API-->>SDK: {id, status, text?, ...}
+        SDK-->>App: Transcription object
+    end
+
+    Note over App,API: Status changes to "completed"
+
+    App->>SDK: result.text
+    SDK-->>App: Transcribed text with metadata
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- WebSocket Flow -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Real-time WebSocket Flow</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <pre class="mermaid">
+sequenceDiagram
+    participant App as Your Application
+    participant SDK as Soniox SDK
+    participant WS as WebSocket Server
+
+    App->>SDK: client = SonioxRealtimeClient(config)
+    App->>SDK: with client.stream() as stream
+    SDK->>WS: WebSocket Connect
+    WS-->>SDK: Connection Established
+
+    SDK->>WS: Send Config Message
+    WS-->>SDK: Acknowledge
+
+    loop Stream audio chunks
+        App->>SDK: stream.send_audio(chunk)
+        SDK->>WS: Binary Audio Data
+        WS-->>SDK: RealtimeToken (interim)
+        SDK-->>App: Yield token
+    end
+
+    App->>SDK: stream.finalize()
+    SDK->>WS: Finalize Message
+    WS-->>SDK: RealtimeToken (final)
+    SDK-->>App: Final tokens
+
+    App->>SDK: Exit context manager
+    SDK->>WS: Close Connection
+    WS-->>SDK: Connection Closed
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Type System -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Type System</h2>
+            <div class="bg-gray-50 p-8 rounded-lg shadow-lg">
+                <pre class="mermaid">
+classDiagram
+    class Token {
+        +text string
+        +start_ms int
+        +end_ms int
+        +confidence float
+        +is_final bool
+        +speaker string
+        +language string
+    }
+
+    class Transcription {
+        +id string
+        +status TranscriptionStatus
+        +text string
+        +tokens List
+        +model string
+        +duration_ms float
+        +created_at datetime
+    }
+
+    class TranscriptionConfig {
+        +model string
+        +enable_speaker_diarization bool
+        +enable_streaming bool
+        +translation TranslationConfig
+        +context ContextConfig
+    }
+
+    class TranslationConfig {
+        &lt;&lt;interface&gt;&gt;
+    }
+
+    class OneWayTranslationConfig {
+        +type string
+        +target_language string
+    }
+
+    class TwoWayTranslationConfig {
+        +type string
+        +language_a string
+        +language_b string
+    }
+
+    class ContextConfig {
+        +general List
+        +text string
+        +terms List
+    }
+
+    TranslationConfig &lt;|-- OneWayTranslationConfig
+    TranslationConfig &lt;|-- TwoWayTranslationConfig
+    Transcription --> Token
+    TranscriptionConfig --> TranslationConfig
+    TranscriptionConfig --> ContextConfig
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Error Handling -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Error Handling Hierarchy</h2>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <pre class="mermaid">
+graph TB
+    Base[SonioxError]
+
+    API[SonioxAPIError]
+    Auth[SonioxAuthenticationError]
+    NotFound[SonioxNotFoundError]
+    Rate[SonioxRateLimitError]
+    Validation[SonioxValidationError]
+    Timeout[SonioxTimeoutError]
+    Network[SonioxNetworkError]
+    Config[SonioxConfigError]
+
+    Base --> API
+    Base --> Config
+    Base --> Network
+    Base --> Timeout
+
+    API --> Auth
+    API --> NotFound
+    API --> Rate
+    API --> Validation
+
+    style Base fill:#ef4444,stroke:#dc2626,color:#fff
+    style API fill:#f59e0b,stroke:#d97706,color:#fff
+    style Auth fill:#f59e0b,stroke:#d97706,color:#fff
+    style NotFound fill:#f59e0b,stroke:#d97706,color:#fff
+    style Rate fill:#f59e0b,stroke:#d97706,color:#fff
+    style Validation fill:#f59e0b,stroke:#d97706,color:#fff
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Capabilities -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Capabilities</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-700">Transcription</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>✓ Async file-based transcription</li>
+                        <li>✓ Real-time streaming transcription</li>
+                        <li>✓ Word-level timestamps</li>
+                        <li>✓ Confidence scores per token</li>
+                        <li>✓ Multiple audio formats (MP3, WAV, PCM)</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-700">Speaker Features</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>✓ Speaker diarization (who spoke when)</li>
+                        <li>✓ Multi-speaker support</li>
+                        <li>✓ Speaker identification</li>
+                        <li>✓ Speaker change detection</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-700">Translation</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>✓ One-way translation (source → target)</li>
+                        <li>✓ Two-way translation (bidirectional)</li>
+                        <li>✓ Real-time translation</li>
+                        <li>✓ 60+ language support</li>
+                        <li>✓ Language auto-detection</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-700">Customisation</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>✓ Custom vocabulary</li>
+                        <li>✓ Domain-specific context</li>
+                        <li>✓ Custom terminology</li>
+                        <li>✓ Context hints for accuracy</li>
+                        <li>✓ Endpoint detection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-12 mt-16">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Soniox Pro SDK</h3>
+                    <p class="text-gray-200">Professional Python SDK for Soniox Speech-to-Text API</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Resources</h3>
+                    <ul class="space-y-2 text-gray-200">
+                        <li><a href="https://github.com/CodeWithBehnam/soniox-pro-sdk" class="hover:text-white">GitHub Repository</a></li>
+                        <li><a href="https://pypi.org/project/soniox-pro-sdk/" class="hover:text-white">PyPI Package</a></li>
+                        <li><a href="https://soniox.com/docs" class="hover:text-white">Soniox API Docs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Community</h3>
+                    <ul class="space-y-2 text-gray-200">
+                        <li><a href="https://github.com/CodeWithBehnam/soniox-pro-sdk/issues" class="hover:text-white">Report Issues</a></li>
+                        <li><a href="https://github.com/CodeWithBehnam/soniox-pro-sdk/discussions" class="hover:text-white">Discussions</a></li>
+                        <li><a href="https://github.com/CodeWithBehnam/soniox-pro-sdk/blob/main/CONTRIBUTING.md" class="hover:text-white">Contributing</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-purple-500 mt-8 pt-8 text-center text-gray-200">
+                <p>Built with Python, uv, Pydantic, and httpx | MIT License</p>
+                <p class="mt-2">Generated with Claude Code</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
