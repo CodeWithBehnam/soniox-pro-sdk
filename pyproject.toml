@@ -1,0 +1,156 @@
+[project]
+name = "soniox-pro-sdk"
+version = "1.0.0"
+description = "Professional Python SDK for Soniox Speech-to-Text API - Blazing fast, production-ready, and fully-featured"
+readme = "README.md"
+authors = [
+    { name = "Behnam Ebrahimi", email = "behnam@example.com" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.12"
+keywords = ["soniox", "speech-to-text", "stt", "transcription", "translation", "real-time", "async", "websocket"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "httpx>=0.27.0",
+    "websockets>=13.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "typing-extensions>=4.10.0; python_version<'3.13'",
+]
+
+[project.optional-dependencies]
+async = [
+    "aiohttp>=3.10.0",
+]
+performance = [
+    "cython>=3.0.0",
+    "numpy>=1.26.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "mypy>=1.8.0",
+    "ruff>=0.2.0",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "pre-commit>=3.6.0",
+    "bandit[toml]>=1.7.0",
+    "detect-secrets>=1.4.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+all = [
+    "soniox-pro-sdk[async,performance,dev,docs]",
+]
+
+[project.urls]
+Homepage = "https://github.com/behnamebrahimi/soniox-python-sdk"
+Documentation = "https://soniox-python-sdk.readthedocs.io"
+Repository = "https://github.com/behnamebrahimi/soniox-python-sdk"
+"Bug Tracker" = "https://github.com/behnamebrahimi/soniox-python-sdk/issues"
+
+[project.scripts]
+soniox-pro = "soniox.cli:main"
+
+[build-system]
+requires = ["hatchling", "cython>=3.0.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/soniox"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=soniox",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["soniox"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "normal"
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # imported but unused
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["soniox"]
